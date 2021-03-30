@@ -1,22 +1,34 @@
-const fetch = require('node-fetch');
+const axios = require('axios').default;
 
 class ApiRequester{
 
     constructor(){
         this.host = process.env.APIHOST;
         this.key = process.env.APIKEY;
-        this.pattern = 'https://weatherapi-com.p.rapidapi.com/forecast.json?q=';
+        this.pattern = 'https://weatherapi-com.p.rapidapi.com/forecast.json';
+    }
+
+    convertDir(dir){
+        const dirs = {
+            N: 'North', W: 'West', E: 'East', S: 'South',
+          };
+          let result = '';
+          for (let i = 0; i < dir.length; i += 1) {
+            result += dirs[dir[i]];
+            if (i === 0 && dir.length > 1) result += '-';
+        }
+        return result;
     }
 
     reformatResponseJson(json){
         const current = json.current;
-        const location = json.weather;
+        const location = json.location;
         
         return {
             city: location.name,
-            coords: '[ ${location.lat}, ${location.lon} ]',
+            coords: `[ ${location.lat}, ${location.lon} ]`,
             temp: `${Math.round(current.temp_c)}°C`,
-            wind: `${current.wind_mph} m/s, ${convertDir(current.wind_dir)}`,
+            wind: `${current.wind_mph} m/s, ${this.convertDir(current.wind_dir)}`,
             cloud: `${current.cloud} %`,
             press: `${current.pressure_mb} hpa`,
             humidity: `${current.humidity} %`,
@@ -25,16 +37,23 @@ class ApiRequester{
     }
 
     async getData(cityorCoords){
-        const query = this.pattern + cityorCoords;
-        const response = await fetch(query, {
+
+        let options = {
             method: 'GET',
+            url: this.pattern,
+            params: {q: cityorCoords},
             headers: {
                 'x-rapidapi-key': this.key,
                 'x-rapidapi-host': this.host
-            }
-        });
-        // return reformatResponseJson(response.json());
-        return response.json();
+            }   
+        };
+
+        try {
+            const response = await axios.request(options);
+            return this.reformatResponseJson(response.data);
+        } catch (error) {
+            throw new Error(error);
+        }
     }
 }
 

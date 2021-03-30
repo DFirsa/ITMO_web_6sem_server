@@ -7,16 +7,26 @@ const apiRequester = new ApiRequester();
 const port = 3000;
 
 app.get('/weather/city', async (req, res) => {
-    console.log(req.query.q)
     if(!req.query.q) res.status(404).json({});
     else{
-        const apiResponse = await apiRequester.getData(req.query.city);
-        res.json(apiResponse);
+        try {
+            const apiResponse = await apiRequester.getData(req.query.q);
+            res.json(apiResponse);
+        } catch (error) {
+            res.status(404).json({});
+        }
     }
 });
 
-app.get('/weather/coordinates', (req, res) => {
-    res.send(req.query.q);
+app.get('/weather/coordinates', async (req, res) => {
+    const regexp = /^-?\d+\.?\d+$/;
+    if(!regexp.test(req.query.lat) || !regexp.test(req.query.lon))
+        res.status(404).json({});
+    else{
+        const query = `${req.query.lat},${req.query.lon}`;
+        const apiResponse = await apiRequester.getData(query);
+        res.json(apiResponse);
+    }
 });
 
 app.get('/favorites', (req, res) => {
