@@ -1,10 +1,9 @@
 require('dotenv').config({path:'.env'});
 const express = require('express');
 const ApiRequester = require('./apiRequester');
-
 const app = express();
 const apiRequester = new ApiRequester();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.get('/weather/city', async (req, res) => {
     if(!req.query.q) res.status(404).json({});
@@ -27,7 +26,7 @@ app.get('/weather/coordinates', async (req, res) => {
         const apiResponse = await apiRequester.getData(query);
         res.json(apiResponse);
     }
-});
+}); 
 
 app.get('/favorites', (req, res) => {
     res.send(req.query.q);
@@ -43,8 +42,8 @@ app.delete('/favorites', (req, res) => {
 
 app.listen(port, (err) => {
     if (err) {
-        return console.log('something bad happened', err)
+        return console.log('Something bad happened', err)
     }
 
-    console.log(`server is listening on ${port}`)
+    console.log(`Server is listening on ${port}`)
 });

@@ -9,10 +9,13 @@
 
 ##Что использовал:
 + Node.js
++ 
+
+##:space_invader:Библиотеки node.js:
 + Express
 + Eslint
 + Dotenv
-+
++ Axios
 
 ## Endpoints
 | Запрос |       Endpoint      |               Пример               |

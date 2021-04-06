@@ -26,7 +26,10 @@ class ApiRequester{
         
         return {
             city: location.name,
-            coords: `[ ${location.lat}, ${location.lon} ]`,
+            coords: {
+                lat : location.lat,
+                lon: location.lon
+            },
             temp: `${Math.round(current.temp_c)}°C`,
             wind: `${current.wind_mph} m/s, ${this.convertDir(current.wind_dir)}`,
             cloud: `${current.cloud} %`,
