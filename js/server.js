@@ -1,9 +1,12 @@
-require('dotenv').config({path:'.env'});
+require('dotenv').config({path: '../.env'})
 const express = require('express');
 const ApiRequester = require('./apiRequester');
-const app = express();
 const apiRequester = new ApiRequester();
+const app = express();
 const port = process.env.PORT || 3000;
+
+const DAO = require('./dao');
+const dao = new DAO();
 
 app.get('/weather/city', async (req, res) => {
     if(!req.query.q) res.status(404).json({});
@@ -12,7 +15,7 @@ app.get('/weather/city', async (req, res) => {
             const apiResponse = await apiRequester.getData(req.query.q);
             res.json(apiResponse);
         } catch (error) {
-            res.status(404).json({});
+            res.status(400).json({});
         }
     }
 });
@@ -28,16 +31,36 @@ app.get('/weather/coordinates', async (req, res) => {
     }
 }); 
 
-app.get('/favorites', (req, res) => {
-    res.send(req.query.q);
+app.get('/favorites', async (req, res) => {
+
+    let favorites = await dao.getAll();
+
+    let favoritesWeather = await Promise.all(favorites.map(async city => {
+        return await apiRequester.getData(city);
+    }));
+    res.json({favorites: favoritesWeather});
 });
 
-app.post('/favorites', (req, res) => {
-
+app.post('/favorites', async (req, res) => {
+    if(!req.query.city) res.status(404).send();
+    else{
+        try{
+            let data = await apiRequester.getData(req.query.city);
+            let city = await dao.insert(data.city, data.coords);
+            res.status(200).json({name: city});
+        }
+        catch{
+            res.status(400);
+        }
+    }
 });
 
-app.delete('/favorites', (req, res) => {
-
+app.delete('/favorites', async (req, res) => {
+    if(!req.query.city) res.status(404).send();
+    else{
+        await dao.delete(req.query.city);
+        res.status(200).send();
+    }
 });
 
 app.listen(port, (err) => {

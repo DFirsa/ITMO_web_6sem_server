@@ -9,7 +9,7 @@
 
 ##Что использовал:
 + Node.js
-+ 
++ MongoDB
 
 ##:space_invader:Библиотеки node.js:
 + Express

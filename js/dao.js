@@ -1,55 +1,71 @@
+const { MongoClient } = require("mongodb");
+
 class DAO{
 
     constructor(){
-        const MongoClient = require('mongodb').MongoClient;
-        const uri = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPWD}@${process.env.MONGOCLUSTER}/${process.env.MONGODB}?retryWrites=true&w=majority`;
-        this.client = new MongoClient(uri, {useNewUrlParser: true, useUnifiedTopology: true});
+        this.uri = `mongodb+srv://${process.env.MONGOUSER}:${process.env.MONGOPWD}@${process.env.MONGOCLUSTER}/${process.env.MONGODB}?retryWrites=true&w=majority`;
     }
 
-    alreadyContains(coords){
-        let result;
-        this.client.connect(async (err) => {
-            const collection = client.db(process.env.MONGODB).collection(process.env.MONGOCOLLECTIONS);
+    async alreadyContains(coords){
 
-            const query = {lat: coords.lat, lon: coords.lon};
-            result = await collection.findOne(query);
-            this.client.close();
-        });
+        let client = await MongoClient.connect(this.uri, {useNewUrlParser: true, useUnifiedTopology: true}); 
+        let db = client.db(process.env.MONGODB);
+        var result = null;
+        try{
+            const query = {lat: coords.lat, lon:coords.lon};
+            result = await db.collection(process.env.MONGOCOLLECTION).findOne(query);
+        }
+        finally{
+            client.close();
+        }
 
-        return result === null;
+        return result !== null;
     }
 
-    insert(city, coords){
-        if(this.alreadyContains) return;
-        this.client.connect(async (err) => {
-            const collection = client.db("favoriteCities").collection("cities");
+    async insert(city, coords){
+        if(await this.alreadyContains(coords)) return;
 
-            const cityObj = {name: city, lat: coords.lat, lon:coords.lon};
-            await collection.insertOne(cityObj);
-            this.client.close();
-        });
+        let client = await MongoClient.connect(this.uri, {useNewUrlParser: true, useUnifiedTopology: true}); 
+        let db = client.db(process.env.MONGODB);
+
+        try{
+            const doc = {name: city, lat: coords.lat, lon:coords.lon};
+            await db.collection(process.env.MONGOCOLLECTION).insertOne(doc);
+            
+        }
+        finally{
+            client.close();
+        }
+
+        return city;
     }
 
-    delete(city){
-        this.client.connect(async (err) => {
-            const collection = client.db("favoriteCities").collection("cities");
-
-            await collection.deleteOne({name: city});
-            this.client.close();
-        });
+    async delete(city){
+        let client = await MongoClient.connect(this.uri, {useNewUrlParser: true, useUnifiedTopology: true}); 
+        let db = client.db(process.env.MONGODB);
+        try{
+            const doc = {name: city};
+            await db.collection(process.env.MONGOCOLLECTION).deleteOne(doc);
+        }
+        finally{
+            client.close();
+        }
     }
 
-    getAll(){
+    async getAll(){
+        let client = await MongoClient.connect(this.uri, {useNewUrlParser: true, useUnifiedTopology: true}); 
+        let db = client.db(process.env.MONGODB);
         let result = [];
-        this.client.connect(async (err) => {
-            const collection = client.db(process.env.MONGODB).collection(process.env.MONGOCOLLECTIONS);
-
-            const cursor = collection.find();
+        try{
+            const cursor = db.collection(process.env.MONGOCOLLECTION).find();
             await cursor.forEach(doc => {
                 result.push(doc.name);
             });
-            this.client.close();
-        });
+        }
+        finally{
+            client.close();
+        }
+
         return result;
     }
 }

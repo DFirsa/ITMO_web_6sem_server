@@ -55,7 +55,7 @@ class ApiRequester{
             const response = await axios.request(options);
             return this.reformatResponseJson(response.data);
         } catch (error) {
-            throw new Error(error);
+            throw error;
         }
     }
 }
