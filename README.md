@@ -7,11 +7,11 @@
 
 > Сервер, реализованный на Node.js для [web-проекта прогноза погоды](https://github.com/DFirsa/ITMO_web_6sem)
 
-##Что использовал:
+## Что использовал:
 + Node.js
 + MongoDB
 
-##:space_invader:Библиотеки node.js:
+## :space_invader:Библиотеки node.js:
 + Express
 + Eslint
 + Dotenv
