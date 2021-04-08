@@ -1,17 +1,16 @@
 require('dotenv').config({ path: '../.env' });
 const express = require('express');
 const ApiRequester = require('./apiRequester');
-
 const apiRequester = new ApiRequester();
 const app = express();
 const port = process.env.PORT || 3000;
-
 const DAO = require('./dao');
-
 const dao = new DAO();
+const cors = require('cors');
+
+app.use(cors());
 
 app.get('/weather/city', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin','*');
   if (!req.query.q) res.status(404).json({});
   else {
     try {
@@ -24,7 +23,6 @@ app.get('/weather/city', async (req, res) => {
 });
 
 app.get('/weather/coordinates', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin','*');
   const regexp = /^-?\d+\.?\d+$/;
   if (!regexp.test(req.query.lat) || !regexp.test(req.query.lon)) { res.status(404).json({}); } else {
     const query = `${req.query.lat},${req.query.lon}`;
@@ -34,7 +32,6 @@ app.get('/weather/coordinates', async (req, res) => {
 });
 
 app.get('/favorites', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin','*');
   const favorites = await dao.getAll();
 
   const favoritesWeather = await Promise.all(favorites.map(async (city) => await apiRequester.getData(city)));
@@ -56,9 +53,6 @@ app.post('/favorites', async (req, res) => {
 });
 
 app.delete('/favorites', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin','https://dfirsa.github.io');
-  res.setHeader('Access-Control-Allow-Methods', 'DELETE');
-
   if (!req.query.city) res.status(404).send();
   else {
     await dao.delete(req.query.city);
