@@ -56,7 +56,7 @@ app.post('/favorites', async (req, res) => {
 });
 
 app.delete('/favorites', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin','*');
+  res.setHeader('Access-Control-Allow-Origin','https://dfirsa.github.io');
   if (!req.query.city) res.status(404).send();
   else {
     await dao.delete(req.query.city);
