@@ -24,4 +24,4 @@
 |    GET | /weather/coordinates| /weather/coordinates?lat=23&lon=23 |
 |    GET | /favorites          | /favorites                         |
 |   POST | /favorites          | /favorites?city=Moscow             |
-| DELETE | /favorites          | /favorites?lat=23&lon=23           |
+| DELETE | /favorites          | /favorites?city=Moscow             |
