@@ -20,8 +20,7 @@ class ApiRequester {
   }
 
   reformatResponseJson(json) {
-    const { current } = json;
-    const { location } = json;
+    const { current, location } = json;
 
     return {
       city: location.name,
@@ -42,19 +41,21 @@ class ApiRequester {
     const options = {
       method: 'GET',
       url: this.pattern,
-      params: { q: cityorCoords },
+      params: { q: cityorCoords.replace(' ', '%20') },
       headers: {
         'x-rapidapi-key': this.key,
         'x-rapidapi-host': this.host,
       },
     };
 
-    try {
-      const response = await axios.request(options);
-      return this.reformatResponseJson(response.data);
-    } catch (error) {
-      throw error;
-    }
+    const response = await axios.request(options);
+    return this.reformatResponseJson(response.data);
+  }
+
+  async getAny(cities){
+    return await Promise.all(cities.map(city => {
+      return this.getData(city);
+    }));
   }
 }
 
