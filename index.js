@@ -1,19 +1,17 @@
 require('dotenv').config({ path: '.env' });
 const express = require('express');
 const cors = require('cors');
-const DAO = require('./services/dao');
 const app = express();
-const dao = new DAO();
-(async () => {await dao.connect()})();
+const { router, dao } = require('./routes/routes')
 const port = process.env.PORT || 3000;
 
 app.use(cors());
+app.use('', router)
 
-const server = app.listen(port, (err) => {
+const server = app.listen(port, async (err) => {
+    await dao.connect();
     if (err) return console.log('Something bad happened', err);
     console.log(`Server is listening on ${port}`);
-
-    require('./routes/routes')(app, dao);
 });
 
 process.on('SIGINT', () => server.close(() => {
