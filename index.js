@@ -10,7 +10,10 @@ app.use('', router)
 
 const server = app.listen(port, async (err) => {
     await dao.connect();
-    if (err) return console.log('Something bad happened', err);
+    if (err){
+        console.log('Something bad happened', err);
+        return;
+    }
     console.log(`Server is listening on ${port}`);
 });
 
