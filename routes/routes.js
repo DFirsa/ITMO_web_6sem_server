@@ -16,7 +16,7 @@ router.get('/weather/city', asyncHandler(async (req, res) => {
     res.json(apiResponse);
 }));
 
-router.get('/weather/coordinates', async (req, res) => {
+router.get('/weather/coordinates', asyncHandler(async (req, res) => {
     if (!isValidCoords(req.query.lat, req.query.lon)){
       res.status(404).json();
       return;
@@ -24,14 +24,14 @@ router.get('/weather/coordinates', async (req, res) => {
     const query = `${req.query.lat},${req.query.lon}`;
     const apiResponse = await apiRequester.getData(query);
     res.json(apiResponse);
-});
+}));
 
-router.get('/favorites', async (req, res) => {
+router.get('/favorites', sayncHandler( async (req, res) => {
     const favorites = await dao.getAll();
     const favoritesWeather = await apiRequester.getAny(favorites);
       
     res.json({ favorites: favoritesWeather });
-});
+}));
 
 router.post('/favorites', asyncHandler(async (req, res) => {
     if (!req.query.city){
@@ -44,7 +44,7 @@ router.post('/favorites', asyncHandler(async (req, res) => {
     res.status(201).json({ name: city });
 }));
 
-router.delete('/favorites', async (req, res) => {
+router.delete('/favorites', asyncHandler( async (req, res) => {
     if (!req.query.city){
       res.status(404).send();
       return;
@@ -52,6 +52,6 @@ router.delete('/favorites', async (req, res) => {
       
     await dao.delete(req.query.city);
     res.status(204).send();
-});
+}));
 
 module.exports = {router: router, dao: dao};
