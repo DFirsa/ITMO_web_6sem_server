@@ -26,7 +26,7 @@ router.get('/weather/coordinates', asyncHandler(async (req, res) => {
     res.json(apiResponse);
 }));
 
-router.get('/favorites', sayncHandler( async (req, res) => {
+router.get('/favorites', asyncHandler( async (req, res) => {
     const favorites = await dao.getAll();
     const favoritesWeather = await apiRequester.getAny(favorites);
       
